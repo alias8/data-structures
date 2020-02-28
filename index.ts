@@ -1,7 +1,8 @@
 export interface IList {
-  head: number;
-  tail: number;
+  headID: number;
+  tailID: number;
   [id: number]: {
+    id: number;
     previous: number | null;
     next: number | null;
   };
@@ -9,10 +10,11 @@ export interface IList {
 
 export class DoublyLinkedList {
   private list: IList;
+  private increment: number = 0;
   constructor(list: number[]) {
     this.list = {
-      head: list[0],
-      tail: list[list.length - 1]
+      headID: list[0],
+      tailID: list[list.length - 1]
     };
     list.forEach((id, index, array) => {
       this.list[id] = {
@@ -39,15 +41,23 @@ export class DoublyLinkedList {
     });
   }
 
-  public insertAt(position: number, value: number) {
+  private checkValues(position: number) {
     const numberOfNodes = Object.keys(this.list).length - 2;
     if (position > numberOfNodes) {
-      throw new Error(`There is no element at index ${position + 1}`);
+      throw new Error(`There is no element at index ${position}`);
     }
+    if (position < 0 || Math.floor(position) !== position) {
+      throw new Error(`Position must be a positive integer`);
+    }
+  }
+
+  public insertAt(position: number, value: number) {
+    this.checkValues(position);
+    const numberOfNodes = Object.keys(this.list).length - 2;
     let count = 0;
-    let currentNode = this.list[this.list.head];
+    let currentNode = this.list[this.list.headID];
     let nextNode = this.list[currentNode.next!];
-    let idOfCurrentNode = this.list.head;
+    let idOfCurrentNode = this.list.headID;
     let idOfNextNode = currentNode.next;
     if (position === 0) {
       // insert at start
@@ -59,14 +69,15 @@ export class DoublyLinkedList {
         ...this.list[idOfCurrentNode],
         previous: value
       };
-      this.list.head = value;
+      this.list.headID = value;
     } else if (position === numberOfNodes) {
-      this.list[this.list.tail].next = value;
+      // append to end
+      this.list[this.list.tailID].next = value;
       this.list[value] = {
-        previous: this.list.tail,
+        previous: this.list.tailID,
         next: null
       };
-      this.list.tail = value;
+      this.list.tailID = value;
     } else {
       while (count < position - 1) {
         currentNode = nextNode;
@@ -83,15 +94,50 @@ export class DoublyLinkedList {
       this.list[idOfCurrentNode].next = value;
       // change next node
       this.list[idOfNextNode!].previous = value;
-      // // if last in list, we need to change the tail
-      // if (count === numberOfNodes) {
-      //   this.list.tail = value;
-      // }
+    }
+  }
+
+  public deleteAt(position: number) {
+    this.checkValues(position);
+    const numberOfNodes = Object.keys(this.list).length - 2;
+    if (position === 0) {
+      // at start
+      const oldHeadNode = this.list[this.list.headID];
+      const oldHeadNodeID = this.list.headID;
+      const newHeadID = oldHeadNode.next;
+      this.list[newHeadID!].previous = null;
+      this.list.headID = newHeadID!;
+      delete this.list[oldHeadNodeID];
+    } else if (position === numberOfNodes - 1) {
+      // at end
+      const oldTailNode = this.list[this.list.tailID];
+      const oldTailNodeID = this.list.tailID;
+      const newTailID = oldTailNode.previous;
+      this.list[newTailID!].next = null;
+      this.list.tailID = newTailID!;
+      delete this.list[oldTailNodeID];
+    } else {
+      let count = 0;
+      let currentNode = this.list[this.list.headID];
+      let nextNode = this.list[currentNode.next!];
+      let idOfCurrentNode = this.list.headID;
+      let idOfNextNode = currentNode.next;
+      while (count < position - 1) {
+        currentNode = nextNode;
+        nextNode = this.list[currentNode.next!];
+        idOfCurrentNode = nextNode.previous!;
+        idOfNextNode = currentNode.next;
+        count++;
+      }
+      const nodeToBeDeleted = currentNode;
+      this.list[nodeToBeDeleted.previous!].next = nodeToBeDeleted.next;
+      this.list[nodeToBeDeleted.next!].previous = nodeToBeDeleted.previous;
+      delete this.list[nextNode.previous!];
     }
   }
 
   public getList() {
-    return this.list;
+    return this.list; ///
   }
 
   public print() {
@@ -101,4 +147,4 @@ export class DoublyLinkedList {
 
 const list = new DoublyLinkedList([5, 23, 7, 13]);
 
-list.insertAt(4, 18);
+list.deleteAt(2);

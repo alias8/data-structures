@@ -7,8 +7,8 @@ test("It builds a doubly linked list", () => {
     "7": { previous: 23, next: 13 },
     "13": { previous: 7, next: null },
     "23": { previous: 5, next: 7 },
-    head: 5,
-    tail: 13
+    headID: 5,
+    tailID: 13
   });
 });
 
@@ -22,8 +22,8 @@ test("It inserts a value correctly at position 0", () => {
     "13": { previous: 7, next: null },
     "18": { previous: null, next: 5 },
     "23": { previous: 5, next: 7 },
-    head: 18,
-    tail: 13
+    headID: 18,
+    tailID: 13
   });
 });
 
@@ -37,8 +37,8 @@ test("It inserts a value correctly in the middle", () => {
     "13": { previous: 7, next: null },
     "18": { previous: 23, next: 7 },
     "23": { previous: 5, next: 18 },
-    head: 5,
-    tail: 13
+    headID: 5,
+    tailID: 13
   });
 });
 
@@ -53,7 +53,46 @@ test("It inserts a value correctly at the end", () => {
     "13": { previous: 7, next: 18 },
     "18": { previous: 13, next: null },
     "23": { previous: 5, next: 7 },
-    head: 5,
-    tail: 18
+    headID: 5,
+    tailID: 18
+  });
+});
+
+test("It deletes a value correctly at the end", () => {
+  const list = new DoublyLinkedList([5, 23, 7, 13]);
+
+  list.deleteAt(3);
+  expect(list.getList()).toEqual({
+    "5": { previous: null, next: 23 }, //
+    "7": { previous: 23, next: null },
+    "23": { previous: 5, next: 7 },
+    headID: 5,
+    tailID: 7
+  });
+});
+
+test("It deletes a value correctly at the start", () => {
+  const list = new DoublyLinkedList([5, 23, 7, 13]);
+
+  list.deleteAt(0);
+  expect(list.getList()).toEqual({
+    "7": { previous: 23, next: 13 },
+    "13": { previous: 7, next: null },
+    "23": { previous: null, next: 7 },
+    headID: 23,
+    tailID: 13
+  });
+});
+
+test("It deletes a value correctly in the middle", () => {
+  const list = new DoublyLinkedList([5, 23, 7, 13]);
+
+  list.deleteAt(2);
+  expect(list.getList()).toEqual({
+    "5": { previous: null, next: 23 },
+    "13": { previous: 23, next: null },
+    "23": { previous: 5, next: 13 },
+    headID: 5,
+    tailID: 13
   });
 });
