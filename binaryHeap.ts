@@ -2,6 +2,7 @@
 export class BinaryHeap {
   private heap: number[];
   private minHeap: boolean;
+
   constructor(values: number[] = [], min = true) {
     this.minHeap = min;
     this.heap = [];
@@ -19,7 +20,10 @@ export class BinaryHeap {
   }
 
   public getParentAtIndex(index?: number) {
-    if (index && index >= 0) {
+    if (index === 0) {
+      throw new Error("No parent");
+    }
+    if (index) {
       if (index % 2 === 0) {
         const parentIndex = (index - 2) / 2;
         return this.heap[parentIndex];
@@ -40,7 +44,10 @@ export class BinaryHeap {
   }
 
   private getParentIndex(index?: number) {
-    if (index && index >= 0) {
+    if (index === 0) {
+      throw new Error("No parent");
+    }
+    if (index && index > 0) {
       if (index % 2 === 0) {
         return (index - 2) / 2;
       } else {
@@ -61,12 +68,11 @@ export class BinaryHeap {
   }
 
   private isViolatedAtIndex(index: number) {
+    if (index === 0) {
+      throw new Error("No parent");
+    }
     if (index <= this.heap.length - 1) {
-      if (this.compare(this.getParentAtIndex(index), this.heap[index])) {
-        return false;
-      } else {
-        return true;
-      }
+      return !this.compare(this.getParentAtIndex(index), this.heap[index]);
     } else {
       throw new Error(`index ${index} out of range`);
     }
@@ -85,6 +91,10 @@ export class BinaryHeap {
     while (this.isViolatedAtIndex(targetNodeIndex)) {
       this.swapChildAtIndexWithItsParent(targetNodeIndex);
       targetNodeIndex = this.getParentIndex(targetNodeIndex);
+      if (targetNodeIndex === 0) {
+        // bubbled to top of tree, nothing more to do
+        break;
+      }
     }
     return this.heap;
   }
@@ -116,6 +126,5 @@ export class BinaryHeap {
   }
 }
 
-const binaryHeap = new BinaryHeap([5]);
+const binaryHeap = new BinaryHeap([5, 6, 12, 8, 7, 14, 19, 13, 12, 11]);
 binaryHeap.add(1);
-const a = 2;

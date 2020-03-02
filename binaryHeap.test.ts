@@ -1,5 +1,9 @@
 import { BinaryHeap } from "./binaryHeap";
 
+test("It works", () => {
+  expect(1).toEqual(1);
+});
+
 test("It adds nodes", () => {
   const binaryHeap = new BinaryHeap([], false);
   binaryHeap.add(9);
@@ -56,4 +60,17 @@ test("It inserts at correct position", () => {
   const binaryHeap = new BinaryHeap([5]);
   binaryHeap.add(1);
   expect(binaryHeap.get()).toEqual([1, 5]);
+});
+
+test("It inserts at correct position", () => {
+  const binaryHeap = new BinaryHeap([5, 6, 12, 8, 7, 14, 19, 13, 12, 11]);
+  binaryHeap.add(1);
+  expect(binaryHeap.get()).toEqual([1, 5, 12, 8, 6, 14, 19, 13, 12, 11, 7]);
+});
+
+test("It inserts at correct position", () => {
+  const binaryHeap = new BinaryHeap([5, 6, 12, 8, 7, 14, 19, 13, 12, 11]);
+  binaryHeap.add(1);
+  binaryHeap.add(13);
+  expect(binaryHeap.get()).toEqual([1, 5, 12, 8, 6, 13, 19, 13, 12, 11, 7, 14]);
 });
