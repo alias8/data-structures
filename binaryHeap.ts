@@ -10,8 +10,8 @@ export class BinaryHeap {
     });
   }
 
-  public compare(a: number, b: number) {
-    return this.minHeap ? a <= b : a >= b;
+  public compare(parent: number, child: number) {
+    return this.minHeap ? parent <= child : parent >= child;
   }
 
   public get() {
@@ -30,20 +30,29 @@ export class BinaryHeap {
     } else {
       // default to get parent of next child
       if (this.heap.length % 2 === 0) {
-        const index = (this.heap.length - 2) / 2;
-        return this.heap[index];
+        const parentIndex = (this.heap.length - 2) / 2;
+        return this.heap[parentIndex];
       } else {
-        const index = (this.heap.length - 1) / 2;
-        return this.heap[index];
+        const parentIndex = (this.heap.length - 1) / 2;
+        return this.heap[parentIndex];
       }
     }
   }
 
-  private getParentIndex() {
-    if (this.heap.length % 2 === 0) {
-      return (this.heap.length - 2) / 2;
+  private getParentIndex(index?: number) {
+    if (index && index >= 0) {
+      if (index % 2 === 0) {
+        return (index - 2) / 2;
+      } else {
+        return (index - 1) / 2;
+      }
     } else {
-      return (this.heap.length - 1) / 2;
+      // default to get parent of next child
+      if (this.heap.length % 2 === 0) {
+        return (this.heap.length - 2) / 2;
+      } else {
+        return (this.heap.length - 1) / 2;
+      }
     }
   }
 
@@ -53,21 +62,31 @@ export class BinaryHeap {
 
   private isViolatedAtIndex(index: number) {
     if (index <= this.heap.length - 1) {
-      if (this.compare(this.heap[index], this.getParentAtIndex(index))) {
+      if (this.compare(this.getParentAtIndex(index), this.heap[index])) {
         return false;
       } else {
+        return true;
       }
     } else {
       throw new Error(`index ${index} out of range`);
     }
   }
 
+  public swapChildAtIndexWithItsParent(childIndex: number) {
+    const parentValue = this.getParentAtIndex(childIndex);
+    const parentIndex = this.getParentIndex(childIndex);
+    this.heap[parentIndex] = this.heap[childIndex];
+    this.heap[childIndex] = parentValue;
+  }
+
   public bubble(element: number) {
-    const tempHeap = [...this.heap];
-    tempHeap.push(element);
-    if (this.isViolatedAtIndex()) const parent = this.getParentAtIndex();
-    const parentIndex = this.getParentIndex();
-    this.heap[parentIndex] = element;
+    this.heap.push(element);
+    let targetNodeIndex = this.heap.length - 1;
+    while (this.isViolatedAtIndex(targetNodeIndex)) {
+      this.swapChildAtIndexWithItsParent(targetNodeIndex);
+      targetNodeIndex = this.getParentIndex(targetNodeIndex);
+    }
+    return this.heap;
   }
 
   public add(element: number) {
@@ -97,6 +116,6 @@ export class BinaryHeap {
   }
 }
 
-const binaryHeap = new BinaryHeap([], false);
-binaryHeap.add(9);
+const binaryHeap = new BinaryHeap([5]);
+binaryHeap.add(1);
 const a = 2;
