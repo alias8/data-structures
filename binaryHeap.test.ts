@@ -74,3 +74,75 @@ test("It inserts at correct position", () => {
   binaryHeap.add(13);
   expect(binaryHeap.get()).toEqual([1, 5, 12, 8, 6, 13, 19, 13, 12, 11, 7, 14]);
 });
+
+test("It inserts at correct position", () => {
+  const binaryHeap = new BinaryHeap([5, 6, 12, 8, 7, 14, 19, 13, 12, 11]);
+  binaryHeap.add(1);
+  binaryHeap.add(13);
+  binaryHeap.add(4);
+  expect(binaryHeap.get()).toEqual([
+    1,
+    5,
+    4,
+    8,
+    6,
+    12,
+    19,
+    13,
+    12,
+    11,
+    7,
+    14,
+    13
+  ]);
+});
+
+test("It inserts at correct position", () => {
+  const binaryHeap = new BinaryHeap([5, 6, 12, 8, 7, 14, 19, 13, 12, 11]);
+  binaryHeap.add(1);
+  binaryHeap.add(13);
+  binaryHeap.add(4);
+  binaryHeap.add(0);
+  expect(binaryHeap.get()).toEqual([
+    0,
+    5,
+    1,
+    8,
+    6,
+    12,
+    4,
+    13,
+    12,
+    11,
+    7,
+    14,
+    13,
+    19
+  ]);
+});
+
+test("It inserts at correct position", () => {
+  const binaryHeap = new BinaryHeap([5, 6, 12, 8, 7, 14, 19, 13, 12, 11]);
+  binaryHeap.add(1);
+  binaryHeap.add(13);
+  binaryHeap.add(4);
+  binaryHeap.add(0);
+  binaryHeap.add(10);
+  expect(binaryHeap.get()).toEqual([
+    0,
+    5,
+    1,
+    8,
+    6,
+    12,
+    4,
+    13,
+    12,
+    11,
+    7,
+    14,
+    13,
+    19,
+    10
+  ]);
+});

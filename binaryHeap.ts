@@ -12,54 +12,34 @@ export class BinaryHeap {
   }
 
   public compare(parent: number, child: number) {
-    return this.minHeap ? parent <= child : parent >= child;
+    return this.minHeap ? parent < child : parent > child;
   }
 
   public get() {
     return this.heap;
   }
 
-  public getParentAtIndex(index?: number) {
-    if (index === 0) {
-      throw new Error("No parent");
-    }
-    if (index) {
-      if (index % 2 === 0) {
-        const parentIndex = (index - 2) / 2;
-        return this.heap[parentIndex];
-      } else {
-        const parentIndex = (index - 1) / 2;
-        return this.heap[parentIndex];
-      }
-    } else {
-      // default to get parent of next child
-      if (this.heap.length % 2 === 0) {
-        const parentIndex = (this.heap.length - 2) / 2;
-        return this.heap[parentIndex];
-      } else {
-        const parentIndex = (this.heap.length - 1) / 2;
-        return this.heap[parentIndex];
-      }
-    }
+  public getParentAtIndex(indexOfChild?: number) {
+    indexOfChild && this.checkValues(indexOfChild);
+    let index = indexOfChild ? indexOfChild : this.heap.length;
+    return this.heap[this.getParentIndex(index)];
   }
 
-  private getParentIndex(index?: number) {
+  private getParentIndex(indexOfChild?: number) {
+    indexOfChild && this.checkValues(indexOfChild);
+    let index = indexOfChild ? indexOfChild : this.heap.length;
+    return (index - (index % 2 === 0 ? 2 : 1)) / 2;
+  }
+
+  private checkValues(index: number) {
     if (index === 0) {
       throw new Error("No parent");
     }
-    if (index && index > 0) {
-      if (index % 2 === 0) {
-        return (index - 2) / 2;
-      } else {
-        return (index - 1) / 2;
-      }
-    } else {
-      // default to get parent of next child
-      if (this.heap.length % 2 === 0) {
-        return (this.heap.length - 2) / 2;
-      } else {
-        return (this.heap.length - 1) / 2;
-      }
+    if (index < 0) {
+      throw new Error("index must be positive");
+    }
+    if (index > this.heap.length - 1) {
+      throw new Error("index out of range");
     }
   }
 
@@ -68,14 +48,8 @@ export class BinaryHeap {
   }
 
   private isViolatedAtIndex(index: number) {
-    if (index === 0) {
-      throw new Error("No parent");
-    }
-    if (index <= this.heap.length - 1) {
-      return !this.compare(this.getParentAtIndex(index), this.heap[index]);
-    } else {
-      throw new Error(`index ${index} out of range`);
-    }
+    index && this.checkValues(index);
+    return !this.compare(this.getParentAtIndex(index), this.heap[index]);
   }
 
   public swapChildAtIndexWithItsParent(childIndex: number) {
