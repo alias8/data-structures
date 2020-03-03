@@ -11,7 +11,7 @@ export class BinaryHeap {
     });
   }
 
-  public compare(parent: number, child: number) {
+  private compare(parent: number, child: number) {
     return this.minHeap ? parent < child : parent > child;
   }
 
@@ -20,9 +20,7 @@ export class BinaryHeap {
   }
 
   public getParentAtIndex(indexOfChild?: number) {
-    indexOfChild && this.checkValues(indexOfChild);
-    let index = indexOfChild ? indexOfChild : this.heap.length;
-    return this.heap[this.getParentIndex(index)];
+    return this.heap[this.getParentIndex(indexOfChild)];
   }
 
   private getParentIndex(indexOfChild?: number) {
@@ -38,9 +36,6 @@ export class BinaryHeap {
     if (index < 0) {
       throw new Error("index must be positive");
     }
-    if (index > this.heap.length - 1) {
-      throw new Error("index out of range");
-    }
   }
 
   private canAdd(element: number) {
@@ -48,18 +43,18 @@ export class BinaryHeap {
   }
 
   private isViolatedAtIndex(index: number) {
-    index && this.checkValues(index);
+    this.checkValues(index);
     return !this.compare(this.getParentAtIndex(index), this.heap[index]);
   }
 
-  public swapChildAtIndexWithItsParent(childIndex: number) {
+  private swapChildAtIndexWithItsParent(childIndex: number) {
     const parentValue = this.getParentAtIndex(childIndex);
     const parentIndex = this.getParentIndex(childIndex);
     this.heap[parentIndex] = this.heap[childIndex];
     this.heap[childIndex] = parentValue;
   }
 
-  public bubble(element: number) {
+  private bubble(element: number) {
     this.heap.push(element);
     let targetNodeIndex = this.heap.length - 1;
     while (this.isViolatedAtIndex(targetNodeIndex)) {
@@ -74,16 +69,14 @@ export class BinaryHeap {
   }
 
   public add(element: number) {
-    if (this.heap.length === 0) {
-      this.heap.push(element);
-    } else if (this.canAdd(element)) {
+    if (this.canAdd(element)) {
       this.heap.push(element);
     } else {
       this.bubble(element);
     }
   }
 
-  public getLeftChild(parentIndex: number) {
+  private getLeftChild(parentIndex: number) {
     const index = 2 * parentIndex + 1;
     if (this.heap.length >= index) {
       return this.heap[index];
@@ -91,7 +84,7 @@ export class BinaryHeap {
     return null;
   }
 
-  public getRightChild(parentIndex: number) {
+  private getRightChild(parentIndex: number) {
     const index = 2 * parentIndex + 2;
     if (this.heap.length >= index) {
       return this.heap[index];
