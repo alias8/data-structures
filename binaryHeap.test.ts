@@ -205,3 +205,35 @@ test("It removes correctly", () => {
   binaryHeap.remove(12);
   expect(binaryHeap.get()).toEqual([1, 3, 2, 5, 6, 2, 2, 13, 8, 11, 7, 10, 15]);
 });
+
+test("It removes correctly", () => {
+  const binaryHeap = new BinaryHeap([
+    1,
+    3,
+    2,
+    5,
+    6,
+    2,
+    2,
+    13,
+    8,
+    11,
+    7,
+    10,
+    15
+  ]);
+  binaryHeap.remove(3);
+  expect(binaryHeap.get()).toEqual([1, 5, 2, 8, 6, 2, 2, 13, 15, 11, 7, 10]);
+});
+
+test("It polls correctly", () => {
+  const binaryHeap = new BinaryHeap([1, 5, 2, 8, 6, 2, 2, 13, 15, 11, 7, 10]);
+  binaryHeap.poll();
+  expect(binaryHeap.get()).toEqual([2, 5, 2, 8, 6, 10, 2, 13, 15, 11, 7]);
+});
+
+test("It removes correctly", () => {
+  const binaryHeap = new BinaryHeap([2, 5, 2, 8, 6, 10, 2, 13, 15, 11, 7]);
+  binaryHeap.remove(6);
+  expect(binaryHeap.get()).toEqual([2, 5, 2, 8, 7, 10, 2, 13, 15, 11]);
+});

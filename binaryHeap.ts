@@ -173,34 +173,24 @@ export class BinaryHeap {
   }
 
   public remove(valueToRemove: number) {
-    const index = this.heap.findIndex(value => value === valueToRemove);
+    const index = this.heap.findIndex(value => value === valueToRemove); // 8
     if (index !== -1) {
       const temp = this.heap[index];
       this.heap[index] = this.heap[this.heap.length - 1];
       this.heap[this.heap.length - 1] = temp;
       this.heap.pop();
-      this.bubbleUp(index);
+      if (this.isViolatedAtIndex(index, "parent")) {
+        this.bubbleUp(index);
+      } else if (this.isViolatedAtIndex(index, "children")) {
+        this.bubbleDown(index);
+      } else {
+        // do nothing
+      }
       return true;
-    } else {
-      return null;
     }
+    return null;
   }
 }
 
-const binaryHeap = new BinaryHeap([
-  1,
-  5,
-  2,
-  8,
-  6,
-  2,
-  2,
-  13,
-  12,
-  11,
-  7,
-  10,
-  15,
-  3
-]);
-binaryHeap.remove(12);
+const binaryHeap = new BinaryHeap([1, 3, 2, 5, 6, 2, 2, 13, 8, 11, 7, 10, 15]);
+binaryHeap.remove(3);
