@@ -97,9 +97,7 @@ export class BinaryHeap {
     }
   }
 
-  public bubble(element: number) {
-    this.heap.push(element);
-    let targetNodeIndex = this.heap.length - 1;
+  private bubbleUp(targetNodeIndex: number = this.heap.length - 1) {
     while (this.isViolatedAtIndex(targetNodeIndex, "parent")) {
       this.swapChildAtIndexWithItsParent(targetNodeIndex);
       targetNodeIndex = this.getParentIndex(targetNodeIndex);
@@ -111,11 +109,15 @@ export class BinaryHeap {
     return this.heap;
   }
 
-  public add(element: number) {
-    if (this.canAdd(element)) {
-      this.heap.push(element);
-    } else {
-      this.bubble(element);
+  private bubbleDown(beginningTargetNodeIndex: number) {
+    let targetNodeIndex: number | null = beginningTargetNodeIndex;
+    while (this.isViolatedAtIndex(targetNodeIndex!, "children")) {
+      targetNodeIndex = this.getChildIndexToSwap(targetNodeIndex!);
+      if (targetNodeIndex !== null) {
+        this.swapChildAtIndexWithItsParent(targetNodeIndex);
+      } else {
+        break;
+      }
     }
   }
 
@@ -125,16 +127,17 @@ export class BinaryHeap {
     this.heap[0] = this.heap[this.heap.length - 1];
     this.heap[this.heap.length - 1] = temp;
     const popped = this.heap.pop();
-    let targetNodeIndex: number | null = 0;
-    while (this.isViolatedAtIndex(targetNodeIndex!, "children")) {
-      targetNodeIndex = this.getChildIndexToSwap(targetNodeIndex);
-      if (targetNodeIndex !== null) {
-        this.swapChildAtIndexWithItsParent(targetNodeIndex);
-      } else {
-        break;
-      }
-    }
+    this.bubbleDown(0);
     return popped;
+  }
+
+  public add(element: number) {
+    if (this.canAdd(element)) {
+      this.heap.push(element);
+    } else {
+      this.heap.push(element);
+      this.bubbleUp();
+    }
   }
 
   private getLeftChildIndex(parentIndex: number) {
@@ -168,4 +171,36 @@ export class BinaryHeap {
     }
     return null;
   }
+
+  public remove(valueToRemove: number) {
+    const index = this.heap.findIndex(value => value === valueToRemove);
+    if (index !== -1) {
+      const temp = this.heap[index];
+      this.heap[index] = this.heap[this.heap.length - 1];
+      this.heap[this.heap.length - 1] = temp;
+      this.heap.pop();
+      this.bubbleUp(index);
+      return true;
+    } else {
+      return null;
+    }
+  }
 }
+
+const binaryHeap = new BinaryHeap([
+  1,
+  5,
+  2,
+  8,
+  6,
+  2,
+  2,
+  13,
+  12,
+  11,
+  7,
+  10,
+  15,
+  3
+]);
+binaryHeap.remove(12);

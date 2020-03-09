@@ -147,7 +147,7 @@ test("It inserts at correct position", () => {
   ]);
 });
 
-test("It removes correctly", () => {
+test("It polls correctly", () => {
   const binaryHeap = new BinaryHeap([
     1,
     5,
@@ -165,7 +165,7 @@ test("It removes correctly", () => {
     3,
     10
   ]);
-  binaryHeap.poll();
+  const poll = binaryHeap.poll();
   expect(binaryHeap.get()).toEqual([
     1,
     5,
@@ -182,4 +182,26 @@ test("It removes correctly", () => {
     15,
     3
   ]);
+  expect(poll).toBe(1);
+});
+
+test("It removes correctly", () => {
+  const binaryHeap = new BinaryHeap([
+    1,
+    5,
+    2,
+    8,
+    6,
+    2,
+    2,
+    13,
+    12,
+    11,
+    7,
+    10,
+    15,
+    3
+  ]);
+  binaryHeap.remove(12);
+  expect(binaryHeap.get()).toEqual([1, 3, 2, 5, 6, 2, 2, 13, 8, 11, 7, 10, 15]);
 });
