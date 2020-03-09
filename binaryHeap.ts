@@ -1,11 +1,17 @@
+interface ITree {
+  [value: number]: Set<number>;
+}
+
 // Min heap
 export class BinaryHeap {
   private heap: number[];
   private minHeap: boolean;
+  private tree: ITree;
 
   constructor(values: number[] = [], min = true) {
     this.minHeap = min;
     this.heap = [];
+    this.tree = {};
     values.forEach(value => {
       this.add(value);
     });
@@ -66,10 +72,7 @@ export class BinaryHeap {
   }
 
   private swapChildAtIndexWithItsParent(childIndex: number) {
-    const parentValue = this.getParentValueOfIndex(childIndex);
-    const parentIndex = this.getParentIndex(childIndex);
-    this.heap[parentIndex] = this.heap[childIndex];
-    this.heap[childIndex] = parentValue;
+    this.swapNodes(childIndex, this.getParentIndex(childIndex));
   }
 
   private compareSiblings(left: number, right: number) {
@@ -99,7 +102,7 @@ export class BinaryHeap {
 
   private bubbleUp(targetNodeIndex: number = this.heap.length - 1) {
     while (this.isViolatedAtIndex(targetNodeIndex, "parent")) {
-      this.swapChildAtIndexWithItsParent(targetNodeIndex);
+      this.swapNodes(targetNodeIndex, this.getParentIndex(targetNodeIndex));
       targetNodeIndex = this.getParentIndex(targetNodeIndex);
       if (targetNodeIndex === 0) {
         // bubbled to top of tree, nothing more to do
@@ -114,7 +117,7 @@ export class BinaryHeap {
     while (this.isViolatedAtIndex(targetNodeIndex!, "children")) {
       targetNodeIndex = this.getChildIndexToSwap(targetNodeIndex!);
       if (targetNodeIndex !== null) {
-        this.swapChildAtIndexWithItsParent(targetNodeIndex);
+        this.swapNodes(targetNodeIndex, this.getParentIndex(targetNodeIndex));
       } else {
         break;
       }
@@ -123,19 +126,22 @@ export class BinaryHeap {
 
   public poll() {
     // swap 1st index with last, then pop it
-    const temp = this.heap[0];
-    this.heap[0] = this.heap[this.heap.length - 1];
-    this.heap[this.heap.length - 1] = temp;
-    const popped = this.heap.pop();
+    this.swapNodes(0, this.heap.length - 1);
+    const popped = this.pop();
     this.bubbleDown();
     return popped;
   }
 
+  private push(element: number) {
+    this.heap.push(element);
+    this.addToTree(element, this.heap.length - 1);
+  }
+
   public add(element: number) {
     if (this.canAdd(element)) {
-      this.heap.push(element);
+      this.push(element);
     } else {
-      this.heap.push(element);
+      this.push(element);
       this.bubbleUp();
     }
   }
@@ -172,13 +178,42 @@ export class BinaryHeap {
     return null;
   }
 
+  private addToTree(value: number, index: number) {
+    if (this.tree[value]) {
+      this.tree[value] = this.tree[value].add(index);
+    } else {
+      this.tree[value] = new Set([index]);
+    }
+  }
+
+  private subtractFromTree(value: number, index: number) {
+    if (this.tree[value]) {
+      this.tree[value].delete(index);
+    }
+  }
+
+  private swapNodes(indexA: number, indexB: number) {
+    const valueA = this.heap[indexA];
+    const valueB = this.heap[indexB];
+    this.heap[indexA] = valueB;
+    this.heap[indexB] = valueA;
+    this.addToTree(valueA, indexB);
+    this.addToTree(valueB, indexA);
+    this.subtractFromTree(valueA, indexA);
+    this.subtractFromTree(valueB, indexB);
+  }
+
+  private pop() {
+    const popped = this.heap.pop();
+    this.subtractFromTree(popped!, this.heap.length);
+    return popped;
+  }
+
   public remove(valueToRemove: number) {
     const index = this.heap.findIndex(value => value === valueToRemove); // 8
     if (index !== -1) {
-      const temp = this.heap[index];
-      this.heap[index] = this.heap[this.heap.length - 1];
-      this.heap[this.heap.length - 1] = temp;
-      this.heap.pop();
+      this.swapNodes(index, this.heap.length - 1);
+      this.pop();
       if (this.isViolatedAtIndex(index, "parent")) {
         this.bubbleUp(index);
       } else if (this.isViolatedAtIndex(index, "children")) {
