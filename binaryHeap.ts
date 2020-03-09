@@ -36,7 +36,7 @@ export class BinaryHeap {
   }
 
   public remove(valueToRemove: number) {
-    const index = this.heap.findIndex(value => value === valueToRemove);
+    const index = this.findIndex(valueToRemove);
     if (index !== -1) {
       this.swapNodes(index, this.heap.length - 1);
       this.pop();
@@ -118,6 +118,14 @@ export class BinaryHeap {
       }
     } else {
       return null;
+    }
+  }
+
+  private findIndex(value: number): number {
+    if (this.tree[value]) {
+      return Array.from(this.tree[value])[0];
+    } else {
+      return -1;
     }
   }
 
