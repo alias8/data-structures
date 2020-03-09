@@ -23,7 +23,7 @@ test("It gets correct parent value", () => {
   binaryHeap.add(9);
   binaryHeap.add(8);
   binaryHeap.add(7);
-  expect(binaryHeap.getParentAtIndex()).toEqual(8);
+  expect(binaryHeap.getParentValueOfIndex()).toEqual(8);
 });
 
 test("It gets correct parent value", () => {
@@ -32,7 +32,7 @@ test("It gets correct parent value", () => {
   binaryHeap.add(8);
   binaryHeap.add(7);
   binaryHeap.add(6);
-  expect(binaryHeap.getParentAtIndex()).toEqual(8);
+  expect(binaryHeap.getParentValueOfIndex()).toEqual(8);
 });
 
 test("It gets correct parent value", () => {
@@ -42,7 +42,7 @@ test("It gets correct parent value", () => {
   binaryHeap.add(7);
   binaryHeap.add(6);
   binaryHeap.add(5);
-  expect(binaryHeap.getParentAtIndex()).toEqual(7);
+  expect(binaryHeap.getParentValueOfIndex()).toEqual(7);
 });
 
 test("It gets correct parent value", () => {
@@ -53,7 +53,7 @@ test("It gets correct parent value", () => {
   binaryHeap.add(6);
   binaryHeap.add(5);
   binaryHeap.add(1);
-  expect(binaryHeap.getParentAtIndex()).toEqual(7);
+  expect(binaryHeap.getParentValueOfIndex()).toEqual(7);
 });
 
 test("It inserts at correct position", () => {
@@ -144,5 +144,42 @@ test("It inserts at correct position", () => {
     13,
     19,
     10
+  ]);
+});
+
+test("It removes correctly", () => {
+  const binaryHeap = new BinaryHeap([
+    1,
+    5,
+    1,
+    8,
+    6,
+    2,
+    2,
+    13,
+    12,
+    11,
+    7,
+    2,
+    15,
+    3,
+    10
+  ]);
+  binaryHeap.poll();
+  expect(binaryHeap.get()).toEqual([
+    1,
+    5,
+    2,
+    8,
+    6,
+    2,
+    2,
+    13,
+    12,
+    11,
+    7,
+    10,
+    15,
+    3
   ]);
 });
