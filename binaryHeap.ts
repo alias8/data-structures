@@ -42,25 +42,27 @@ export class BinaryHeap {
     return this.compare(this.getParentValueOfIndex(), element);
   }
 
-  private isViolatedAtIndex(index: number, checkParent: boolean) {
-    if (checkParent) {
+  private isViolatedAtIndex(
+    index: number,
+    check: "parent" | "children"
+  ): boolean {
+    if (check === "parent") {
       // for bubbling up, or when we add stuff
       return !this.compare(this.getParentValueOfIndex(index), this.heap[index]);
-    } else {
-      // for bubbling down, or when we take out stuff
-      const leftChild = this.getLeftChildValue(index);
-      const rightChild = this.getRightChildValue(index);
-      if (
-        !!leftChild &&
-        this.compare(this.heap[index], leftChild) &&
-        !!rightChild &&
-        this.compare(this.heap[index], rightChild)
-      ) {
-        return false;
-      } else {
-        return true;
-      }
     }
+    // for bubbling down, or when we take out stuff
+    const leftChild = this.getLeftChildValue(index);
+    const rightChild = this.getRightChildValue(index);
+    if (leftChild) {
+      if (this.compare(this.heap[index], leftChild)) {
+        if (rightChild) {
+          return !this.compare(this.heap[index], rightChild);
+        }
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 
   private swapChildAtIndexWithItsParent(childIndex: number) {
@@ -74,42 +76,31 @@ export class BinaryHeap {
     return this.minHeap ? left <= right : left >= right;
   }
 
-  private swapParentAtIndexWithItsChild(parentIndex: number) {
-    const swapParentWithChild = (parentIndex: number, childIndex: number) => {
-      const temp = this.heap[parentIndex];
-      this.heap[parentIndex] = this.heap[childIndex];
-      this.heap[childIndex] = temp;
-    };
-
+  private getChildIndexToSwap(parentIndex: number): number | null {
     const leftChildIndex = this.getLeftChildIndex(parentIndex);
     const rightChildIndex = this.getRightChildIndex(parentIndex);
-    if (leftChildIndex) {
-      const leftChild = this.getLeftChildValue(parentIndex);
-      if (rightChildIndex) {
-        const rightChild = this.getRightChildValue(parentIndex);
-        if (this.compareSiblings(leftChild!, rightChild!)) {
-          // if left less than right, swap parent with left
-          swapParentWithChild(parentIndex, leftChildIndex);
-          return leftChildIndex;
-        } else {
-          // if right less than left, swap parent with right
-          swapParentWithChild(parentIndex, rightChildIndex);
-          return rightChildIndex;
-        }
-      } else {
-        // swap parent with left if only left child avail
-        swapParentWithChild(parentIndex, leftChildIndex);
+    if (!rightChildIndex) {
+      return leftChildIndex;
+    } else if (leftChildIndex) {
+      if (
+        this.compareSiblings(
+          this.heap[leftChildIndex],
+          this.heap[rightChildIndex]
+        )
+      ) {
         return leftChildIndex;
+      } else {
+        return rightChildIndex;
       }
     } else {
-      throw new Error("cannot do swap, no valid children");
+      return null;
     }
   }
 
   public bubble(element: number) {
     this.heap.push(element);
     let targetNodeIndex = this.heap.length - 1;
-    while (this.isViolatedAtIndex(targetNodeIndex, true)) {
+    while (this.isViolatedAtIndex(targetNodeIndex, "parent")) {
       this.swapChildAtIndexWithItsParent(targetNodeIndex);
       targetNodeIndex = this.getParentIndex(targetNodeIndex);
       if (targetNodeIndex === 0) {
@@ -129,20 +120,21 @@ export class BinaryHeap {
   }
 
   public poll() {
-    // swap 1st index with last
+    // swap 1st index with last, then pop it
     const temp = this.heap[0];
     this.heap[0] = this.heap[this.heap.length - 1];
     this.heap[this.heap.length - 1] = temp;
-    this.heap.pop();
-    let targetNodeIndex = 0;
-    while (this.isViolatedAtIndex(targetNodeIndex, false)) {
-      targetNodeIndex = this.swapParentAtIndexWithItsChild(targetNodeIndex);
-      if (targetNodeIndex === this.heap.length - 1) {
-        // bubbled to bottom of tree, nothing more to do
+    const popped = this.heap.pop();
+    let targetNodeIndex: number | null = 0;
+    while (this.isViolatedAtIndex(targetNodeIndex!, "children")) {
+      targetNodeIndex = this.getChildIndexToSwap(targetNodeIndex);
+      if (targetNodeIndex !== null) {
+        this.swapChildAtIndexWithItsParent(targetNodeIndex);
+      } else {
         break;
       }
     }
-    return this.heap;
+    return popped;
   }
 
   private getLeftChildIndex(parentIndex: number) {
@@ -177,23 +169,3 @@ export class BinaryHeap {
     return null;
   }
 }
-
-const binaryHeap = new BinaryHeap([
-  1,
-  5,
-  1,
-  8,
-  6,
-  2,
-  2,
-  13,
-  12,
-  11,
-  7,
-  2,
-  15,
-  3,
-  10
-]);
-binaryHeap.poll();
-const a = 2;
