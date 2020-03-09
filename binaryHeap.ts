@@ -20,13 +20,11 @@ export class BinaryHeap {
   }
 
   public getParentValueOfIndex(indexOfChild?: number) {
-    // indexOfChild && this.checkValues(indexOfChild);
-    let index = indexOfChild ? indexOfChild : this.heap.length;
-    return this.heap[this.getParentIndex(index)];
+    return this.heap[this.getParentIndex(indexOfChild)];
   }
 
   private getParentIndex(indexOfChild?: number) {
-    // indexOfChild && this.checkValues(indexOfChild);
+    indexOfChild && this.checkValues(indexOfChild);
     let index = indexOfChild ? indexOfChild : this.heap.length;
     return (index - (index % 2 === 0 ? 2 : 1)) / 2;
   }
@@ -37,9 +35,6 @@ export class BinaryHeap {
     }
     if (index < 0) {
       throw new Error("index must be positive");
-    }
-    if (index > this.heap.length - 1) {
-      throw new Error("index out of range");
     }
   }
 
@@ -126,9 +121,7 @@ export class BinaryHeap {
   }
 
   public add(element: number) {
-    if (this.heap.length === 0) {
-      this.heap.push(element);
-    } else if (this.canAdd(element)) {
+    if (this.canAdd(element)) {
       this.heap.push(element);
     } else {
       this.bubble(element);
