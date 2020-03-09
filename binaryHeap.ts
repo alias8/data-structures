@@ -109,7 +109,7 @@ export class BinaryHeap {
     return this.heap;
   }
 
-  private bubbleDown(beginningTargetNodeIndex: number) {
+  private bubbleDown(beginningTargetNodeIndex: number = 0) {
     let targetNodeIndex: number | null = beginningTargetNodeIndex;
     while (this.isViolatedAtIndex(targetNodeIndex!, "children")) {
       targetNodeIndex = this.getChildIndexToSwap(targetNodeIndex!);
@@ -127,7 +127,7 @@ export class BinaryHeap {
     this.heap[0] = this.heap[this.heap.length - 1];
     this.heap[this.heap.length - 1] = temp;
     const popped = this.heap.pop();
-    this.bubbleDown(0);
+    this.bubbleDown();
     return popped;
   }
 
