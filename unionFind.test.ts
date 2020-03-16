@@ -33,3 +33,20 @@ test("It groups together", () => {
     ["A", "B", 5, 1]
   ]);
 });
+
+test("It groups together", () => {
+  const union = new UnionFind([
+    ["I", "J", 0, null],
+    ["A", "E", 1, null],
+    ["C", "I", 1, null],
+    ["E", "F", 1, null],
+    ["G", "H", 1, null],
+    ["B", "D", 2, null],
+    ["C", "J", 2, null],
+    ["D", "E", 2, null],
+    ["D", "H", 2, null]
+  ]);
+
+  union.getSortedEdges();
+  union.group();
+});

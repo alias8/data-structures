@@ -17,57 +17,82 @@ export class UnionFind {
   }
 
   public getSortedEdges() {
-    return this.edges.sort((a, b) => (a[2] < b[2] ? -1 : 1));
+    return this.edges.sort((a, b) => {
+      if (a[2] < b[2]) {
+        return -1;
+      } else if (a[2] > b[2]) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
   }
 
   public group() {
-    this.edges.map((edge, index) => {
+    [...this.edges].forEach((edge: IEdge, index) => {
       if (edge[3] === null) {
-        const edgeCopy = this.edges[index];
-        const preferredGroup = this.preferredGroupAvailable(edgeCopy);
+        if (edge[0] === "D" && edge[1] === "E") {
+          const a = 2;
+        }
+        const preferredGroup = this.preferredGroupAvailable(edge);
         if (preferredGroup === "loop") {
           // do nothing
         } else if (preferredGroup === "none") {
           // make new group
-          edgeCopy[3] = this.groupID++;
+          edge[3] = this.groupID++;
         } else {
           // use preferred group
-          edgeCopy[3] = preferredGroup;
+          edge[3] = preferredGroup;
         }
-        return edgeCopy;
       }
     });
   }
 
   private preferredGroupAvailable(targetEdge: IEdge) {
-    const findFirst = this.edges.find(edge => {
-      const searchIds = edge.slice(0, 1);
-      return searchIds.includes(targetEdge[0]);
-    });
-    const findSecond = this.edges.find(edge => {
-      const searchIds = edge.slice(0, 1);
-      return searchIds.includes(targetEdge[1]);
-    });
-    if (!!findFirst && !!findSecond) {
-      // in loop
+    const targetEdgeLetters = targetEdge.slice(0, 2).join("");
+    const filteredEdges = this.edges
+      .filter(edge => edge[3] !== null) // only search un grouped edges
+      .filter(edge => edge.slice(0, 2).join("") !== targetEdgeLetters); // skip comparing the same edge
+    const findFirst = filteredEdges.find(edge => {
+      return edge
+        .slice(0, 2)
+        .join("")
+        .includes(targetEdge[0]);
+    }); // see if first letter of target edge is included in this edge
+    const findSecond = filteredEdges.find(edge => {
+      return edge
+        .slice(0, 2)
+        .join("")
+        .includes(targetEdge[1]);
+    }); // see if first letter of target edge is included in this edge
+    if (this.isCycle(findFirst, findSecond)) {
       return "loop";
     }
-    if (findFirst) {
-      return findFirst[3];
-    } else if (findSecond) {
-      return findSecond[3];
+    if (findFirst && findFirst[3] !== null) {
+      return findFirst[3]; // use this group
+    } else if (findSecond && findSecond[3] !== null) {
+      return findSecond[3]; // use this group
     } else {
-      return "none";
+      return "none"; // make new group
     }
+  }
+
+  private isCycle(a, b) {
+    // how to find cycle? this is wrong
+    return !!a && !!b;
   }
 }
 
 const union = new UnionFind([
-  ["A", "B", 5, null],
+  ["I", "J", 0, null],
   ["A", "E", 1, null],
-  ["A", "D", 4, null],
-  ["E", "D", 2, null],
-  ["B", "D", 2, null]
+  ["C", "I", 1, null],
+  ["E", "F", 1, null],
+  ["G", "H", 1, null],
+  ["B", "D", 2, null],
+  ["C", "J", 2, null],
+  ["D", "E", 2, null],
+  ["D", "H", 2, null]
 ]);
 
 union.getSortedEdges();
