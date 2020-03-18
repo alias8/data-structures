@@ -1,52 +1,37 @@
-import { UnionFind } from "./unionFind";
+import { KruskalsAlgorithm } from "./unionFind";
 
 test("It gets sorted edges", () => {
-  const union = new UnionFind([
-    ["A", "B", 5, null],
-    ["A", "E", 1, null],
-    ["A", "D", 4, null],
-    ["E", "D", 2, null],
-    ["B", "D", 2, null]
-  ]);
-  expect(union.getSortedEdges()).toEqual([
+  const union = new KruskalsAlgorithm([
+    ["A", "B", 5],
     ["A", "E", 1],
-    ["B", "D", 2],
-    ["D", "E", 2],
     ["A", "D", 4],
-    ["A", "B", 5]
+    ["E", "D", 2],
+    ["E", "F", 1],
+    ["D", "F", 5],
+    ["D", "G", 11],
+    ["D", "B", 2],
+    ["D", "H", 2],
+    ["B", "C", 4],
+    ["C", "H", 4],
+    ["C", "I", 1],
+    ["C", "J", 2],
+    ["I", "J", 0],
+    ["H", "I", 6],
+    ["H", "G", 1],
+    ["C", "I", 1],
+    ["G", "I", 4],
+    ["F", "G", 7]
   ]);
-});
-
-test("It groups together", () => {
-  const union = new UnionFind([
-    ["A", "B", 5, null],
-    ["A", "E", 1, null],
-    ["A", "D", 4, null],
-    ["E", "D", 2, null],
-    ["B", "D", 2, null]
+  union.unionAll();
+  expect(union.get()).toEqual([
+    ["A", "E", 1],
+    ["E", "F", 1],
+    ["E", "D", 2],
+    ["D", "H", 2],
+    ["H", "G", 1],
+    ["D", "B", 2],
+    ["B", "C", 4],
+    ["C", "I", 1],
+    ["I", "J", 0]
   ]);
-  expect(union.getSortedEdges()).toEqual([
-    ["A", "E", 1, 1],
-    ["B", "D", 2, 2],
-    ["D", "E", 2, 2],
-    ["A", "D", 4, 1],
-    ["A", "B", 5, 1]
-  ]);
-});
-
-test("It groups together", () => {
-  const union = new UnionFind([
-    ["I", "J", 0, null],
-    ["A", "E", 1, null],
-    ["C", "I", 1, null],
-    ["E", "F", 1, null],
-    ["G", "H", 1, null],
-    ["B", "D", 2, null],
-    ["C", "J", 2, null],
-    ["D", "E", 2, null],
-    ["D", "H", 2, null]
-  ]);
-
-  union.getSortedEdges();
-  union.group();
 });

@@ -1,100 +1,159 @@
-type IEdge = [string, string, number, number | null]; // [id1, id2, edgeWeight, group]
-
-export class UnionFind {
+type IEdge = [string, string, number]; // [id1, id2, edgeWeight]
+type Colour = number;
+/*
+ * Find minimum spanning tree. I don't understand how to stop
+ * unioning stuff when we find a connected tree.
+ *
+ * Uses a data structure called disjoint-set / union–find / merge-find set
+ * https://en.wikipedia.org/wiki/Minimum_spanning_tree#Algorithms
+ * */
+export class KruskalsAlgorithm {
   private edges: IEdge[];
-  private groupID: number = 0;
+  private findGroupByVertex: { [vertex: string]: Colour } = {};
+  private getIDsInGroup: { [colour: number]: Set<string> } = {};
+  private unvistedVertices: Set<string> = new Set();
   constructor(edges: IEdge[]) {
-    this.edges = edges.map(edge => {
-      if (edge[0] === edge[1]) {
-        throw Error(`edge with id: ${edge[0]} cannot be connected to itself`);
+    // sort list of edges so that shortest length is at the start
+    const temp = new Set();
+    this.edges = edges
+      .map(edge => {
+        if (edge[0] === edge[1]) {
+          throw Error(`edge with id: ${edge[0]} cannot be connected to itself`);
+        }
+        const combined = [...[edge[0], edge[1]].sort(), edge[2]] as IEdge;
+        // check for duplicates
+        if (temp.has(combined)) {
+          throw new Error(`duplicate edge: ${combined}`);
+        }
+        temp.add(combined);
+        return combined;
+      })
+      .sort((a, b) => {
+        if (a[2] !== b[2]) {
+          // if unequal weights, use that to sort
+          return a[2] - b[2];
+        } else if (a[0] !== b[0]) {
+          // if unequal first letters, sort by that
+          return a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0;
+        } else {
+          // if equal everything else, sort by 2nd letter
+          return a[1] < b[1] ? -1 : a[1] > b[1] ? 1 : 0;
+        }
+      });
+
+    let colour: Colour = 0;
+    this.edges.forEach(edge => {
+      const vertex1 = edge[0];
+      const vertex2 = edge[1];
+      if (!(vertex1 in this.findGroupByVertex)) {
+        this.findGroupByVertex[vertex1] = colour;
+        this.getIDsInGroup[colour] = new Set([vertex1]);
+        colour++;
       }
-      return [...[edge[0], edge[1]].sort(), edge[2], null] as IEdge;
+      if (!(vertex2 in this.findGroupByVertex)) {
+        this.findGroupByVertex[vertex2] = colour;
+        this.getIDsInGroup[colour] = new Set([vertex2]);
+        colour++;
+      }
+      this.unvistedVertices.add(vertex1);
+      this.unvistedVertices.add(vertex2);
     });
+  }
+
+  public get() {
+    return this.edges;
   }
 
   public print() {
     return console.log(this.edges);
   }
 
-  public getSortedEdges() {
-    return this.edges.sort((a, b) => {
-      if (a[2] < b[2]) {
-        return -1;
-      } else if (a[2] > b[2]) {
-        return 1;
-      } else {
-        return 0;
-      }
-    });
+  private isConnectedTree() {
+    return false;
+    // if (this.unvistedVertices.size === 0) {
+    //   return true;
+    // } else {
+    //   return false;
+    // }
   }
 
-  public group() {
-    [...this.edges].forEach((edge: IEdge, index) => {
-      if (edge[3] === null) {
-        if (edge[0] === "D" && edge[1] === "E") {
-          const a = 2;
-        }
-        const preferredGroup = this.preferredGroupAvailable(edge);
-        if (preferredGroup === "loop") {
-          // do nothing
-        } else if (preferredGroup === "none") {
-          // make new group
-          edge[3] = this.groupID++;
+  public unionAll() {
+    let index = 0;
+    while (index < this.edges.length && !this.isConnectedTree()) {
+      const edge = this.edges[index]; // AE
+      const firstVertex = edge[0];
+      const secondVertex = edge[1];
+      const firstVertexGroup = this.findGroupByVertex[firstVertex]; // 0
+      const secondVertexGroup = this.findGroupByVertex[secondVertex]; // 1
+      if (firstVertexGroup !== secondVertexGroup) {
+        // if groups are not equal, attempt to combine them
+        const firstGroupSize = this.getIDsInGroup[firstVertexGroup].size;
+        const secondGroupSize = this.getIDsInGroup[secondVertexGroup].size;
+        if (firstGroupSize >= secondGroupSize) {
+          // make 2nd group part of 1st
+          const iterator = this.getIDsInGroup[secondVertexGroup].values();
+          for (let vertex of iterator) {
+            this.findGroupByVertex[vertex] = firstVertexGroup;
+            this.getIDsInGroup[firstVertexGroup].add(vertex);
+            this.getIDsInGroup[secondVertexGroup].delete(vertex);
+          }
         } else {
-          // use preferred group
-          edge[3] = preferredGroup;
+          // make 1st part of 2nd
+          this.findGroupByVertex[firstVertex] = secondVertexGroup;
+          this.getIDsInGroup[secondVertexGroup].add(firstVertex);
+          this.getIDsInGroup[firstVertexGroup].delete(firstVertex);
         }
+        this.unvistedVertices.delete(firstVertex);
+        this.unvistedVertices.delete(secondVertex);
+      } else {
+        // groups are equal, do not connect them as this would create a cycle
       }
-    });
-  }
-
-  private preferredGroupAvailable(targetEdge: IEdge) {
-    const targetEdgeLetters = targetEdge.slice(0, 2).join("");
-    const filteredEdges = this.edges
-      .filter(edge => edge[3] !== null) // only search un grouped edges
-      .filter(edge => edge.slice(0, 2).join("") !== targetEdgeLetters); // skip comparing the same edge
-    const findFirst = filteredEdges.find(edge => {
-      return edge
-        .slice(0, 2)
-        .join("")
-        .includes(targetEdge[0]);
-    }); // see if first letter of target edge is included in this edge
-    const findSecond = filteredEdges.find(edge => {
-      return edge
-        .slice(0, 2)
-        .join("")
-        .includes(targetEdge[1]);
-    }); // see if first letter of target edge is included in this edge
-    if (this.isCycle(findFirst, findSecond)) {
-      return "loop";
-    }
-    if (findFirst && findFirst[3] !== null) {
-      return findFirst[3]; // use this group
-    } else if (findSecond && findSecond[3] !== null) {
-      return findSecond[3]; // use this group
-    } else {
-      return "none"; // make new group
+      index++;
     }
   }
 
-  private isCycle(a, b) {
-    // how to find cycle? this is wrong
-    return !!a && !!b;
+  private swap(
+    fromVertexName: string,
+    toVertexColour: number,
+    fromVertexColour: number
+  ) {
+    this.findGroupByVertex[fromVertexName] = toVertexColour;
+    this.getIDsInGroup[toVertexColour].add(fromVertexName);
+    this.getIDsInGroup[fromVertexColour].delete(fromVertexName);
   }
 }
 
-const union = new UnionFind([
-  ["I", "J", 0, null],
-  ["A", "E", 1, null],
-  ["C", "I", 1, null],
-  ["E", "F", 1, null],
-  ["G", "H", 1, null],
-  ["B", "D", 2, null],
-  ["C", "J", 2, null],
-  ["D", "E", 2, null],
-  ["D", "H", 2, null]
+const union = new KruskalsAlgorithm([
+  ["I", "J", 0],
+  ["A", "E", 1],
+  ["C", "I", 1],
+  ["E", "F", 1],
+  ["G", "H", 1],
+  ["B", "D", 2],
+  ["C", "J", 2],
+  ["D", "E", 2],
+  ["D", "H", 2],
+  ["A", "D", 4],
+  ["B", "C", 4],
+  ["C", "H", 4],
+  ["G", "I", 4],
+  ["A", "B", 5],
+  ["D", "F", 5],
+  ["H", "I", 6],
+  ["F", "G", 7],
+  ["D", "G", 11]
 ]);
 
-union.getSortedEdges();
-union.group();
+const aa = [
+  ["A", "E", 1],
+  ["E", "F", 1],
+  ["E", "D", 2],
+  ["D", "H", 2],
+  ["H", "G", 1],
+  ["D", "B", 2],
+  ["B", "C", 4],
+  ["I", "J", 0]
+];
+
+union.unionAll();
 union.print();
