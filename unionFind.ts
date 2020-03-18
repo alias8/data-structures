@@ -1,8 +1,7 @@
 type IEdge = [string, string, number]; // [id1, id2, edgeWeight]
 type Colour = number;
 /*
- * Find minimum spanning tree. I don't understand how to stop
- * unioning stuff when we find a connected tree.
+ * Find minimum spanning tree.
  *
  * Uses a data structure called disjoint-set / union–find / merge-find set
  * https://en.wikipedia.org/wiki/Minimum_spanning_tree#Algorithms
@@ -69,12 +68,10 @@ export class KruskalsAlgorithm {
   }
 
   private isConnectedTree() {
-    return false;
-    // if (this.unvistedVertices.size === 0) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
+    return (
+      this.unvistedVertices.size === 0 &&
+      Object.keys(this.getIDsInGroup).length === 1
+    );
   }
 
   public unionAll() {
@@ -83,25 +80,18 @@ export class KruskalsAlgorithm {
       const edge = this.edges[index]; // AE
       const firstVertex = edge[0];
       const secondVertex = edge[1];
-      const firstVertexGroup = this.findGroupByVertex[firstVertex]; // 0
-      const secondVertexGroup = this.findGroupByVertex[secondVertex]; // 1
-      if (firstVertexGroup !== secondVertexGroup) {
+      const firstVertexColour = this.findGroupByVertex[firstVertex]; // 0
+      const secondVertexColour = this.findGroupByVertex[secondVertex]; // 1
+      if (firstVertexColour !== secondVertexColour) {
         // if groups are not equal, attempt to combine them
-        const firstGroupSize = this.getIDsInGroup[firstVertexGroup].size;
-        const secondGroupSize = this.getIDsInGroup[secondVertexGroup].size;
+        const firstGroupSize = this.getIDsInGroup[firstVertexColour].size;
+        const secondGroupSize = this.getIDsInGroup[secondVertexColour].size;
         if (firstGroupSize >= secondGroupSize) {
           // make 2nd group part of 1st
-          const iterator = this.getIDsInGroup[secondVertexGroup].values();
-          for (let vertex of iterator) {
-            this.findGroupByVertex[vertex] = firstVertexGroup;
-            this.getIDsInGroup[firstVertexGroup].add(vertex);
-            this.getIDsInGroup[secondVertexGroup].delete(vertex);
-          }
+          this.swap(secondVertexColour, firstVertexColour);
         } else {
           // make 1st part of 2nd
-          this.findGroupByVertex[firstVertex] = secondVertexGroup;
-          this.getIDsInGroup[secondVertexGroup].add(firstVertex);
-          this.getIDsInGroup[firstVertexGroup].delete(firstVertex);
+          this.swap(firstVertexColour, secondVertexColour);
         }
         this.unvistedVertices.delete(firstVertex);
         this.unvistedVertices.delete(secondVertex);
@@ -110,16 +100,24 @@ export class KruskalsAlgorithm {
       }
       index++;
     }
+    console.log(
+      `found minimum spanning tree after ${index + 1} of ${
+        this.edges.length
+      } union steps`
+    );
+    return this.getIDsInGroup;
   }
 
-  private swap(
-    fromVertexName: string,
-    toVertexColour: number,
-    fromVertexColour: number
-  ) {
-    this.findGroupByVertex[fromVertexName] = toVertexColour;
-    this.getIDsInGroup[toVertexColour].add(fromVertexName);
-    this.getIDsInGroup[fromVertexColour].delete(fromVertexName);
+  private swap(fromVertexColour: Colour, toVertexColour: Colour) {
+    const iterator = this.getIDsInGroup[fromVertexColour].values();
+    for (let fromVertexName of iterator) {
+      this.findGroupByVertex[fromVertexName] = toVertexColour;
+      this.getIDsInGroup[toVertexColour].add(fromVertexName);
+      this.getIDsInGroup[fromVertexColour].delete(fromVertexName);
+      if (this.getIDsInGroup[fromVertexColour].size === 0) {
+        delete this.getIDsInGroup[fromVertexColour];
+      }
+    }
   }
 }
 
@@ -155,5 +153,5 @@ const aa = [
   ["I", "J", 0]
 ];
 
-union.unionAll();
+const aab = union.unionAll();
 union.print();
