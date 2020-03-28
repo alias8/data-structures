@@ -40,6 +40,7 @@ export class KruskalsAlgorithm {
         }
       });
 
+    // give random colours to each vertex
     let colour: Colour = 0;
     this.edges.forEach(edge => {
       const vertex1 = edge[0];
@@ -74,6 +75,10 @@ export class KruskalsAlgorithm {
     );
   }
 
+  private find(vertex: string): Colour {
+    return this.findGroupByVertex[vertex];
+  }
+
   public unionAll() {
     let index = 0;
     while (index < this.edges.length && !this.isConnectedTree()) {
@@ -88,10 +93,10 @@ export class KruskalsAlgorithm {
         const secondGroupSize = this.getIDsInGroup[secondVertexColour].size;
         if (firstGroupSize >= secondGroupSize) {
           // make 2nd group part of 1st
-          this.swap(secondVertexColour, firstVertexColour);
+          this.union(secondVertexColour, firstVertexColour);
         } else {
           // make 1st part of 2nd
-          this.swap(firstVertexColour, secondVertexColour);
+          this.union(firstVertexColour, secondVertexColour);
         }
         this.unvistedVertices.delete(firstVertex);
         this.unvistedVertices.delete(secondVertex);
@@ -108,7 +113,7 @@ export class KruskalsAlgorithm {
     return this.getIDsInGroup;
   }
 
-  private swap(fromVertexColour: Colour, toVertexColour: Colour) {
+  private union(fromVertexColour: Colour, toVertexColour: Colour) {
     const iterator = this.getIDsInGroup[fromVertexColour].values();
     for (let fromVertexName of iterator) {
       this.findGroupByVertex[fromVertexName] = toVertexColour;
