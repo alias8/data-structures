@@ -9,7 +9,7 @@ type Colour = number;
 export class KruskalsAlgorithm {
   private edges: IEdge[];
   private findGroupByVertex: { [vertex: string]: Colour } = {};
-  private getIDsInGroup: { [colour: number]: Set<string> } = {};
+  private getVertexesInGroup: { [colour: number]: Set<string> } = {};
   private unvistedVertices: Set<string> = new Set();
   constructor(edges: IEdge[]) {
     // sort list of edges so that shortest length is at the start
@@ -47,12 +47,12 @@ export class KruskalsAlgorithm {
       const vertex2 = edge[1];
       if (!(vertex1 in this.findGroupByVertex)) {
         this.findGroupByVertex[vertex1] = colour;
-        this.getIDsInGroup[colour] = new Set([vertex1]);
+        this.getVertexesInGroup[colour] = new Set([vertex1]);
         colour++;
       }
       if (!(vertex2 in this.findGroupByVertex)) {
         this.findGroupByVertex[vertex2] = colour;
-        this.getIDsInGroup[colour] = new Set([vertex2]);
+        this.getVertexesInGroup[colour] = new Set([vertex2]);
         colour++;
       }
       this.unvistedVertices.add(vertex1);
@@ -71,7 +71,7 @@ export class KruskalsAlgorithm {
   private isConnectedTree() {
     return (
       this.unvistedVertices.size === 0 &&
-      Object.keys(this.getIDsInGroup).length === 1
+      Object.keys(this.getVertexesInGroup).length === 1
     );
   }
 
@@ -85,12 +85,13 @@ export class KruskalsAlgorithm {
       const edge = this.edges[index]; // AE
       const firstVertex = edge[0];
       const secondVertex = edge[1];
-      const firstVertexColour = this.findGroupByVertex[firstVertex]; // 0
-      const secondVertexColour = this.findGroupByVertex[secondVertex]; // 1
+      const firstVertexColour = this.find(firstVertex); // 0
+      const secondVertexColour = this.find(secondVertex); // 1
       if (firstVertexColour !== secondVertexColour) {
         // if groups are not equal, attempt to combine them
-        const firstGroupSize = this.getIDsInGroup[firstVertexColour].size;
-        const secondGroupSize = this.getIDsInGroup[secondVertexColour].size;
+        const firstGroupSize = this.getVertexesInGroup[firstVertexColour].size;
+        const secondGroupSize = this.getVertexesInGroup[secondVertexColour]
+          .size;
         if (firstGroupSize >= secondGroupSize) {
           // make 2nd group part of 1st
           this.union(secondVertexColour, firstVertexColour);
@@ -110,17 +111,17 @@ export class KruskalsAlgorithm {
         this.edges.length
       } union steps`
     );
-    return this.getIDsInGroup;
+    return this.getVertexesInGroup;
   }
 
   private union(fromVertexColour: Colour, toVertexColour: Colour) {
-    const iterator = this.getIDsInGroup[fromVertexColour].values();
+    const iterator = this.getVertexesInGroup[fromVertexColour].values();
     for (let fromVertexName of iterator) {
       this.findGroupByVertex[fromVertexName] = toVertexColour;
-      this.getIDsInGroup[toVertexColour].add(fromVertexName);
-      this.getIDsInGroup[fromVertexColour].delete(fromVertexName);
-      if (this.getIDsInGroup[fromVertexColour].size === 0) {
-        delete this.getIDsInGroup[fromVertexColour];
+      this.getVertexesInGroup[toVertexColour].add(fromVertexName);
+      this.getVertexesInGroup[fromVertexColour].delete(fromVertexName);
+      if (this.getVertexesInGroup[fromVertexColour].size === 0) {
+        delete this.getVertexesInGroup[fromVertexColour];
       }
     }
   }
