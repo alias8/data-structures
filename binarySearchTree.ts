@@ -211,6 +211,7 @@ export class BinarySearchTree<T extends Comparable<T>> {
     if (node == null) return 0;
     return (
       Math.max(
+        // each call will add 1 to the result, so we count the number of times we branch down
         this.heightRecursive(node.left),
         this.heightRecursive(node.right)
       ) + 1

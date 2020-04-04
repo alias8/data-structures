@@ -1,19 +1,17 @@
-interface IElement {
-  id: string;
-}
+import { Entry, standardValues } from "./hashTable";
 
-class Node1 {
+class Node_<Element> {
   // constructor
-  public element: IElement;
-  public next: null | Node1;
-  constructor(element: IElement) {
+  public element: Element;
+  public next: null | Node_<Element>;
+  constructor(element: Element) {
     this.element = element;
     this.next = null;
   }
 }
 
-class LinkedList {
-  private head: null | Node1;
+export class LinkedList<Element extends Entry<any> = Entry<standardValues>> {
+  private head: null | Node_<Element>;
   private size: number;
   constructor() {
     this.head = null;
@@ -70,20 +68,20 @@ class LinkedList {
     return this.head;
   }
 
-  insertAt(data: IElement, index: number) {
+  insertAt(data: Element, index: number) {
     // if the list is empty i.e. head = null
     if (!this.head) {
-      this.head = new Node1(data);
+      this.head = new Node_(data);
       return;
     }
     // if new node needs to be inserted at the front of the list i.e. before the head.
     if (index === 0) {
-      this.head = new Node1(data);
+      this.head = new Node_(data);
       return;
     }
     // else, use getAt() to find the previous node.
     const previous = this.getAt(index - 1);
-    let newNode = new Node1(data);
+    let newNode = new Node_(data);
     newNode.next = previous!.next;
     previous!.next = newNode;
 
@@ -103,10 +101,10 @@ class LinkedList {
     return null;
   }
 
-  insertAtEnd(data: IElement) {
+  insertAtEnd(data: Element) {
     // A newNode object is created with property data and next=null
 
-    let newNode = new Node1(data);
+    let newNode = new Node_(data);
     // When head = null i.e. the list is empty, then head itself will point to the newNode.
     if (!this.head) {
       this.head = newNode;
@@ -121,9 +119,9 @@ class LinkedList {
     return this.head;
   }
 
-  insertAtBeginning(data: IElement) {
+  insertAtBeginning(data: Element) {
     // A newNode object is created with property data and next = null
-    let newNode = new Node1(data);
+    let newNode = new Node_(data);
     // The pointer next is assigned head pointer so that both pointers now point at the same node.
     newNode.next = this.head;
     // As we are inserting at the beginning the head pointer needs to now point at the newNode.
@@ -132,12 +130,12 @@ class LinkedList {
     return this.head;
   }
 
-  add(element: IElement) {
+  add(element: Element) {
     // creates a new node
-    const node = new Node1(element);
+    const node = new Node_(element);
 
     // to store current node
-    var current: Node1;
+    var current: Node_<Element>;
 
     // if list is Empty add the
     // element and make it head
@@ -158,13 +156,22 @@ class LinkedList {
     this.size++;
   }
 
+  getSize() {
+    return this.size;
+  }
+
   deleteList() {
     this.head = null;
   }
-}
 
-const list = new LinkedList();
-list.add({ id: "0" });
-list.add({ id: "1" });
-list.add({ id: "2" });
-const a = 33;
+  find(key: standardValues) {
+    let node = this.head;
+    while (node) {
+      if (node.element.getKey() === key) {
+        return node;
+      }
+      node = node.next;
+    }
+    return undefined;
+  }
+}
