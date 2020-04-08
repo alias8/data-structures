@@ -31,7 +31,7 @@ export class Entry<V> {
   }
 }
 
-function hash(key: string | number) {
+export function hash(key: string | number) {
   if (typeof key === "string") {
     return key.split("").reduce((prev, letter) => {
       const bb = prev + polynomial(letter.charCodeAt(0));
@@ -47,8 +47,13 @@ function hash(key: string | number) {
 }
 
 export type standardValues = string | number;
-
-class HashTable<Element extends Entry<any> = Entry<standardValues>> {
+/*
+ * If the table is expected to have a high load factor, the records are large, or the
+ * data is variable-sized, chained hash tables often perform as well or better
+ * */
+class HashTable_SeparateChaining<
+  Element extends Entry<any> = Entry<standardValues>
+> {
   private maxSize = 1;
   private table: Array<LinkedList<Element> | null> = [];
   private size = 0;
@@ -124,7 +129,7 @@ class HashTable<Element extends Entry<any> = Entry<standardValues>> {
   }
 }
 
-const table = new HashTable();
+const table = new HashTable_SeparateChaining();
 table.add("james", 1);
 table.add("george", 2);
 table.add("jerry", 3);

@@ -1,4 +1,4 @@
-import { Entry, standardValues } from "./hashTable";
+import { Entry, standardValues } from "./hashTableSeparateChaining";
 
 class Node_<Element> {
   // constructor
