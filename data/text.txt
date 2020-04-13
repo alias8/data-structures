@@ -1,0 +1,8 @@
+car
+cot
+cots
+trie
+try
+tries
+tried
+trim

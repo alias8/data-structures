@@ -2,7 +2,7 @@
   "name": "data-structures",
   "version": "1.0.0",
   "description": "",
-  "main": "linkedList.js",
+  "main": "src/linkedList.js",
   "scripts": {
     "test": "jest",
     "start": "tsc --watch"
