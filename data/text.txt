@@ -1,4 +1,7 @@
+at
 car
+card
+cards
 cot
 cots
 trie

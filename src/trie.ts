@@ -76,11 +76,16 @@ export class Trie {
     }
     return false;
   }
+
+  printAllWords(node: Node1 = this.tree) {
+    for (let char in node.children) {
+      const b = 2;
+    }
+  }
 }
 
 const text = fs.readFileSync("../data/text.txt", "utf8");
 const textByLine = text.split(/\r\n/);
 const trie = new Trie(textByLine);
-const aa = trie.remove("car");
-const ab = trie.remove("car");
+const aa = trie.printAllWords();
 const bb = 2;
