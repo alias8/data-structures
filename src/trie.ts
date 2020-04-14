@@ -12,6 +12,7 @@ export class Trie {
     isCompleteWord: false,
     children: {}
   };
+  private wordCount = 0;
   constructor(words: string[]) {
     words.forEach(word => {
       this.insert(word);
@@ -27,6 +28,7 @@ export class Trie {
         isCompleteWord: word.length === 1,
         children: {}
       };
+      this.wordCount++;
     }
     this.insert(word.slice(1), node.children[word[0]]);
   }
@@ -59,6 +61,7 @@ export class Trie {
   ): boolean {
     if (word.length === 0 && node.isCompleteWord) {
       node.isCompleteWord = false;
+      this.wordCount--;
       if (Object.keys(node.children).length === 0) {
         // delete further up chain
         // todo: is this needed?
@@ -77,10 +80,26 @@ export class Trie {
     return false;
   }
 
-  printAllWords(node: Node1 = this.tree) {
-    for (let char in node.children) {
-      const b = 2;
+  printAllWords(
+    cb = (val: string) => {
+      console.log(val);
+    },
+    node: Node1 = this.tree,
+    w = ""
+  ) {
+    let word = w;
+    if (node.isCompleteWord) {
+      cb(word);
     }
+    Object.entries(node.children).forEach(([char, node]) => {
+      word += char;
+      this.printAllWords(cb, node, word); // depth-first search
+      word = word.substr(0, word.length - 1); // backward tracking, take off last letter
+    });
+  }
+
+  wordsCount() {
+    return this.wordCount;
   }
 }
 
