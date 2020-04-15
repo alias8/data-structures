@@ -2,9 +2,15 @@ import fs from "fs";
 
 interface Node1 {
   isCompleteWord: boolean;
+  freq?: number;
   children: {
     [char: string]: Node1;
   };
+}
+
+interface IWord {
+  word: string;
+  freq: number;
 }
 
 export class Trie {
@@ -13,24 +19,28 @@ export class Trie {
     children: {}
   };
   private wordCount = 0;
-  constructor(words: string[]) {
+  constructor(words: IWord[]) {
     words.forEach(word => {
-      this.insert(word);
+      this.insert(word.word, word.freq);
+      if (this.wordCount % 1000 === 0) {
+        console.log("word count ", this.wordCount);
+      }
     });
   }
 
-  insert(word: string, node: Node1 = this.tree) {
+  insert(word: string, freq: number, node: Node1 = this.tree) {
     if (word.length === 0) {
+      this.wordCount++;
       return;
     }
     if (!node.children[word[0]]) {
       node.children[word[0]] = {
         isCompleteWord: word.length === 1,
+        freq: word.length === 1 ? freq : undefined,
         children: {}
       };
-      this.wordCount++;
     }
-    this.insert(word.slice(1), node.children[word[0]]);
+    this.insert(word.slice(1), freq, node.children[word[0]]);
   }
 
   has(word: string, node: Node1 = this.tree): boolean {
@@ -104,7 +114,19 @@ export class Trie {
 }
 
 const text = fs.readFileSync("../data/text.txt", "utf8");
-const textByLine = text.split(/\r\n/);
+const textByLine = text.split("\n").map(item => {
+  return {
+    word: item.split(" ")[0],
+    freq: Number.parseInt(item.split(" ")[1])
+  };
+});
 const trie = new Trie(textByLine);
-const aa = trie.printAllWords();
+const t = trie.findNode("t");
+const th = trie.findNode("th");
+const the = trie.findNode("the");
+const thei = trie.findNode("thei");
+const their = trie.findNode("their");
+const theirs = trie.findNode("theirs");
+// todo: use the frequency to make suggestions for word completion?
+// const aa = trie.printAllWords();
 const bb = 2;
