@@ -114,12 +114,19 @@ export class Trie {
 }
 
 const text = fs.readFileSync("../data/text.txt", "utf8");
-const textByLine = text.split("\n").map(item => {
-  return {
-    word: item.split(" ")[0],
-    freq: Number.parseInt(item.split(" ")[1])
-  };
-});
+// const textByLine = text
+//   .split("\n")
+//   .map(item => ({
+//     word: item.split(" ")[0],
+//     freq: Number.parseInt(item.split(" ")[1])
+//   }))
+//   .filter(item => item.freq)
+//   .sort((a, b) => b.freq - a.freq)
+//   .map(item => `${item.word} ${item.freq}`)
+//   .join("\n");
+// fs.writeFileSync("../data/text1.txt", textByLine);
+const textByLine = text.split("\n");
+fs.writeFileSync("../data/text1.txt", textByLine);
 const trie = new Trie(textByLine);
 const t = trie.findNode("t");
 const th = trie.findNode("th");
